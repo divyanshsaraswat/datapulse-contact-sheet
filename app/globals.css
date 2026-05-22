@@ -749,8 +749,8 @@ textarea.input {
   display: grid;
   grid-template-areas:
     "status title tags actions chevron"
-    "empty url empty actions chevron"
-    "empty meta empty actions chevron";
+    ". url . actions chevron"
+    ". meta . actions chevron";
   grid-template-columns: auto 1fr auto auto auto;
   align-items: center;
   gap: 4px 16px;
