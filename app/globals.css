@@ -746,24 +746,50 @@ textarea.input {
 .nb-cell.has-update::before { background: var(--amber); }
 
 .nb-cell-header {
-  display: flex;
+  display: grid;
+  grid-template-areas:
+    "status title tags actions chevron"
+    "empty url empty actions chevron"
+    "empty meta empty actions chevron";
+  grid-template-columns: auto 1fr auto auto auto;
   align-items: center;
-  gap: 12px;
+  gap: 4px 16px;
   padding: 16px 20px;
   cursor: pointer;
   user-select: none;
 }
 .nb-cell-header:hover .nb-expand-icon { color: var(--primary-light); }
 
-.nb-cell-name {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
-  flex: 1;
-  min-width: 0;
+.nb-cell-status-dot {
+  grid-area: status;
+  align-self: center;
+}
+.nb-cell-title-wrap {
+  grid-area: title;
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+}
+.nb-cell-name-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nb-cell-chevron-wrap {
+  grid-area: chevron;
+  grid-row: 1 / span 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+}
+.nb-cell-url-wrap {
+  grid-area: url;
+  min-width: 0;
 }
 .nb-cell-url {
   font-size: 12px;
@@ -772,14 +798,17 @@ textarea.input {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 400px;
+  max-width: 500px;
+}
+.nb-cell-meta-wrap {
+  grid-area: meta;
+  min-width: 0;
 }
 .nb-cell-meta {
   display: flex;
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
-  margin-top: 4px;
 }
 .nb-cell-stat {
   font-size: 12px;
@@ -789,12 +818,38 @@ textarea.input {
   gap: 4px;
 }
 .nb-cell-stat strong { color: var(--text-secondary); font-weight: 500; }
+
+.nb-cell-tags-wrap {
+  grid-area: tags;
+  grid-row: 1 / span 3;
+  display: flex;
+  align-items: center;
+}
 .nb-cell-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+
+.nb-cell-actions-wrap {
+  grid-area: actions;
+  grid-row: 1 / span 3;
+  display: flex;
+  align-items: center;
+}
 .nb-cell-actions {
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-shrink: 0;
+}
+.nb-cell-actions-menu {
+  position: absolute;
+  right: 0;
+  top: 110%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 6px;
+  z-index: 100;
+  min-width: 160px;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.15s ease;
 }
 .nb-expand-icon {
   color: var(--text-muted);
@@ -1610,13 +1665,174 @@ textarea.input {
 /* ============================================
    RESPONSIVE
    ============================================ */
+@media (max-width: 768px) {
+  /* Toolbar Layout Split Grid */
+  .toolbar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+  .search-wrap {
+    grid-column: 1 / -1;
+    max-width: none;
+    width: 100%;
+  }
+  .custom-select {
+    width: 100%;
+  }
+  .custom-select-trigger {
+    width: 100%;
+    min-width: 0;
+  }
+  #refresh-all-btn, #add-endpoint-btn {
+    flex: 1;
+    width: 100%;
+    margin: 0;
+  }
+  .toolbar > span {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin: 4px 0 0 !important;
+  }
+
+  /* Notebook Cell Grid Stacking */
+  .nb-cell-header {
+    grid-template-areas:
+      "status title chevron"
+      ". url ."
+      ". meta ."
+      ". tags ."
+      "actions actions actions";
+    grid-template-columns: auto 1fr auto;
+    gap: 8px 12px;
+    padding: 14px 16px;
+  }
+  .nb-cell-chevron-wrap {
+    grid-area: chevron;
+    grid-row: auto;
+  }
+  .nb-cell-tags-wrap {
+    grid-area: tags;
+    grid-row: auto;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 2px;
+  }
+  .nb-cell-actions-wrap {
+    grid-area: actions;
+    grid-row: auto;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 12px;
+    margin-top: 6px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
+  .nb-cell-actions {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  /* Make more-menu dropdown behave properly inside grid */
+  .nb-cell-actions-menu {
+    right: 0;
+    top: auto;
+    bottom: calc(100% + 8px) !important; /* flip to open upwards since action bar is at the bottom */
+  }
+}
+
 @media (max-width: 640px) {
   .navbar { padding: 0 16px; }
-  .toolbar { padding: 12px 16px; }
   .tag-filters { padding: 0 16px 12px; }
   .notebook { padding: 0 16px 80px; }
-  .nb-cell-header { padding: 14px 16px; }
   .login-card { padding: 32px 24px; }
-  .nb-cell-url { max-width: 200px; }
-  .nb-cell-meta { gap: 8px; }
+  
+  /* Make url text more compact */
+  .nb-cell-url { max-width: 100%; }
+  .nb-cell-meta { gap: 8px 12px; }
+  .nb-cell-stat { font-size: 11.5px; }
+
+  /* Compact header buttons */
+  .refresh-btn-text {
+    display: none;
+  }
+  .refresh-btn {
+    padding: 6px;
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Table Controls Stack */
+  .table-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 10px 16px;
+  }
+  .col-picker {
+    justify-content: flex-start;
+  }
+  .table-search-wrap {
+    width: 100%;
+  }
+  .table-search {
+    width: 100%;
+  }
+  #export-csv-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* High Density Preview Tables */
+  .data-table th, .data-table td {
+    padding: 8px 10px;
+    font-size: 11.5px;
+  }
+
+  /* Modal responsive spacing */
+  .modal-overlay {
+    padding: 12px;
+  }
+  .modal {
+    max-height: 95vh;
+  }
+  .modal-header {
+    padding: 18px 20px 0;
+  }
+  .modal-body {
+    padding: 16px 20px;
+    gap: 16px;
+  }
+  .modal-footer {
+    padding: 0 20px 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Key-value input stacking inside Modal */
+  .kv-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 6px;
+    align-items: center;
+  }
+  .kv-row .input:first-of-type {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .kv-row .input:last-of-type {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .kv-row .kv-remove {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    padding: 10px;
+    height: 100%;
+  }
 }
